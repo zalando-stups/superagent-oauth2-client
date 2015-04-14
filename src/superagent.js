@@ -1,4 +1,4 @@
-import {Request} from 'oauth2-client-js';
+import {Request, Response} from 'oauth2-client-js';
 
 export default function(superagent) {
     /**
@@ -6,7 +6,7 @@ export default function(superagent) {
      *
      * @return {Promise}
      */
-    function exec() {
+    function end() {
         return new Promise((resolve, reject) => {
             this.end((error, res) => {
                 if (error) {
@@ -17,76 +17,89 @@ export default function(superagent) {
         });
     }
 
+    function buildRequest(config, applyMetadataFn) {
+        let authRequest = new Request(config);
+        if (applyMetadataFn) {
+            applyMetadataFn(authRequest);
+        }
+        return authRequest;
+    }
+
+    function requestAccessToken(provider, request) {
+        let redirectionUri = provider.requestToken(request);
+        // remember this request for later when we get a response
+        provider.remember(request);
+        // request is done via redirect to auth provider
+        if (ENV_PRODUCTION) {
+            window.location.href = redirectionUri;
+        }
+    }
+
+    function useAccessToken(provider) {
+        this.set('Authorization', `Token ${provider.getAccessToken()}`);
+        return end.call(this);
+    }
+
+    function refreshAccessToken(provider) {
+        let request = provider.refreshToken();
+        provider.remember(request);
+        return superagent
+                .get(provider.encodeInUri(request))
+                .exec();
+    }
+
+    function clone() {
+        let doppelganger = new superagent.Request();
+        doppelganger.method = this.method;
+        doppelganger.url = this.url;
+        doppelganger._query = this._query;
+        return doppelganger;
+    }
+
     superagent.Request.prototype.exec = function(applyMetadataFn) {
         // if this request doesn't have oauth enabled,
-        // just execute itgw
+        // just execute it
         if (!this._oauthEnabled) {
-            return exec.call(this);
+            return end.call(this);
         }
+
         return new Promise((resolve, reject) => {
+            let provider = this._oauthProvider,
+                requestConfig = this._oauthRequestConfig,
+                request = buildRequest(requestConfig, applyMetadataFn);
 
-            function requestAccessToken() {
-                // no token. we need to request one
-                let authRequest = new Request(this._oauthRequestConfig);
-                if (applyMetadataFn) {
-                    applyMetadataFn(authRequest);
-                }
-                let redirectionUri = this._oauthProvider.requestToken(authRequest);
-                // remember this request for later when we get a response
-                this._oauthProvider.remember(authRequest);
-                // request is done via redirect to auth provider
-                reject(authRequest);
-                if (ENV_PRODUCTION) {
-                    window.location.href = redirectionUri;
-                }
-            }
-
-            let provider = this._oauthProvider;
-            // otherwise we need to
-            // - check if we have a token for this provider in our storage
             if (provider.hasAccessToken()) {
-                // there is a token and WE WILL USE IT FOR FUCKS SAKE
-                // it might be invalid tho
-
-                // set appropriate header
-                this.set('Authorization', `Token ${provider.getAccessToken()}`);
-                // execute request
-                exec
-                    .call(this)
-                    .then(resolve)  // token was apparently ok
-                    .catch(err => {
-                        if (err.status === 401 ) {
+                useAccessToken.call(this, provider)
+                    .then(resp => {
+                        // token was apparently ok
+                        resolve(resp);
+                    })  
+                    .catch(accessError => {
+                        if (accessError.status === 401 ) {
                             // Unauthorized
-                            
                             if (provider.hasRefreshToken()) {
-                                superagent
-                                    .get(provider.refreshToken())
-                                    .exec()
+                                refreshAccessToken(provider)
                                     .then(resp => {
-                                        try {
-                                            provider.handleResponse(resp);
-                                            this
-                                                .exec(applyMetadataFn)
-                                                .then(resolve)
-                                                .catch(e => reject(e));
-                                        } catch(handleResponseError) {
-                                            reject(handleResponseError);
-                                        }
-                                        
+                                        provider.handleResponse(new Response(resp.body));
+                                        let _clone = clone.call(this);
+                                        end.call(_clone).then(resolve).catch(reject);
                                     })
-                                    .catch(reject);
+                                    .catch(refreshError => {
+                                    });
                             } else {
                                 // No refresh token, we need to request a new access token
-                                requestAccessToken.call(this);
+                                reject(request);
+                                return requestAccessToken(provider, request);
                             }
                         } else {
                             // We got an error, but the token appears to be valid
                             // reject and pass the error
-                            reject(err);
+                            return reject(accessError);
                         }
                     });
             } else {
-                requestAccessToken.call(this);
+                reject(request);
+                return requestAccessToken(provider, request);
             }
         });
     };

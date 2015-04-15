@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/zalando/superagent-oauth2-client",
   "dependencies": {
-    "oauth2-client-js": "0.0.2",
+    "oauth2-client-js": "0.0.4",
     "superagent": "zalando/superagent.git#d9cc9f5615466d08c6b39793a2e0056540a8f5f5"
   },
   "devDependencies": {

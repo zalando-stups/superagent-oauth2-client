@@ -41,10 +41,8 @@ export default function(superagent) {
     }
 
     function refreshAccessToken(provider) {
-        let request = provider.refreshToken();
-        provider.remember(request);
         return superagent
-                .get(provider.encodeInUri(request))
+                .get(provider.refreshToken())
                 .exec();
     }
 

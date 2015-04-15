@@ -48,14 +48,6 @@ export default function(superagent) {
                 .exec();
     }
 
-    function clone() {
-        let doppelganger = new superagent.Request();
-        doppelganger.method = this.method;
-        doppelganger.url = this.url;
-        doppelganger._query = this._query;
-        return doppelganger;
-    }
-
     superagent.Request.prototype.exec = function(applyMetadataFn) {
         // if this request doesn't have oauth enabled,
         // just execute it
@@ -80,11 +72,15 @@ export default function(superagent) {
                             if (provider.hasRefreshToken()) {
                                 refreshAccessToken(provider)
                                     .then(resp => {
-                                        provider.handleResponse(new Response(resp.body));
-                                        let _clone = clone.call(this);
-                                        end.call(_clone).then(resolve).catch(reject);
+                                        provider.handleRefresh(resp.body);
+                                        useAccessToken.call(this.clone(), provider)
+                                            .then(resolve)
+                                            .catch(reject);
                                     })
                                     .catch(refreshError => {
+                                        // Dunno what to do when the refresh request fails,
+                                        // so we just reject and pass the error
+                                        reject(refreshError);
                                     });
                             } else {
                                 // No refresh token, we need to request a new access token
@@ -98,6 +94,7 @@ export default function(superagent) {
                         }
                     });
             } else {
+                // No access token, so we request a new one
                 reject(request);
                 return requestAccessToken(provider, request);
             }

@@ -3,10 +3,11 @@ import patchSuperagent from '../src/superagent';
 import {Provider, MemoryStorage} from 'oauth2-client-js';
 import querystring from 'querystring';
 
-process.on('uncaughtException', function(err) {
-    console.log('Caught exception: ' + err);
-});
+// process.on('uncaughtException', function(err) {
+//     console.log('Caught exception: ' + err.stack);
+// });
 
+var request = patchSuperagent(superagent);
 const TESTLOCATION = 'http://localhost';
 const DEFAULT_REQUEST = {
     client_id: 'client_id',
@@ -14,7 +15,7 @@ const DEFAULT_REQUEST = {
 };
 
 describe('superagent-oauth2-client', () => {
-    var request, provider, mitm;
+    var provider, mitm;
     
     beforeEach(() => {
         provider = new Provider({
@@ -22,12 +23,10 @@ describe('superagent-oauth2-client', () => {
             authorization_url: 'http://localhost/auth',
             store: new MemoryStorage()
         });
-        request = patchSuperagent(superagent);
         mitm = Mitm();
     });
 
     afterEach(() => {
-        request = null;
         mitm.disable();
     });
 
@@ -137,7 +136,6 @@ describe('superagent-oauth2-client', () => {
         provider.setAccessToken('access_token');
         provider.setRefreshToken('refresh_token');
 
-        var reqCount = 0;
         mitm.on('request', function(req, res) {
             if (req.url.startsWith('/auth')) {
                 res.statusCode = 200;
@@ -151,7 +149,8 @@ describe('superagent-oauth2-client', () => {
                 res.setHeader('Content-Type', 'application/json');
                 res.end(JSON.stringify(resp));
             } else {
-                res.statusCode = reqCount === 0 ? 401 : 200;
+                let returnError = req.headers.authorization === 'Token access_token';
+                res.statusCode = returnError ? 401 : 200;
                 let errorResp = {
                     error: 'invalid'
                 };
@@ -159,27 +158,18 @@ describe('superagent-oauth2-client', () => {
                     data: 123
                 };
                 res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify(reqCount === 0 ? errorResp : resp));
-                reqCount++;
+                res.end(JSON.stringify(returnError ? errorResp : resp));
             }
         });
-
-        // req.on('request', req => console.log('onRequest', req.url));
-        // req.on('progress', req => console.log('onProgress', req.total));
-        // req.on('end', () => console.log('onEnd'));
 
         req
         .exec()
         .then(resp => {
             expect(resp.body.data).to.equal(123);
             done();
+        })
+        .catch(e => {
+            console.log(e.stack);
         });
-    });
-});
-
-describe('superagent', () => {
-    it('should be able to call smth once', done => {
-        superagent(TESTLOCATION)
-            .end(err => done());
     });
 });

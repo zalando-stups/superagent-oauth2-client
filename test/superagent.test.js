@@ -21,7 +21,7 @@ describe('superagent-oauth2-client', () => {
         provider = new Provider({
             id: 'test',
             authorization_url: 'http://localhost/auth',
-            store: new MemoryStorage()
+            storage: new MemoryStorage()
         });
         mitm = Mitm();
     });
@@ -54,7 +54,7 @@ describe('superagent-oauth2-client', () => {
         
         expect(req instanceof Promise).to.be.true;
         req.catch(auth => {
-            let saved = provider.store.get(auth.state);
+            let saved = provider.storage.get(auth.state);
             expect(saved).to.be.ok;
             expect(auth.metadata.timestamp).to.equal(123);
             expect(saved.metadata).to.be.ok;

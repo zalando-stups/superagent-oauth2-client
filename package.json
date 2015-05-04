@@ -1,6 +1,6 @@
 {
   "name": "superagent-oauth2-client",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A superagent plugin for oauth2-client",
   "main": "dist/superagent-oauth2-client.js",
   "scripts": {

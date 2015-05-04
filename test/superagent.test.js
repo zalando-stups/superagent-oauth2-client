@@ -72,7 +72,7 @@ describe('superagent-oauth2-client', () => {
                     .oauth(provider, DEFAULT_REQUEST);
 
         mitm.on('request', function(req, res) {
-            expect(req.headers.authorization).to.equal('Token token');
+            expect(req.headers.authorization).to.equal('Bearer token');
             done();
         });
 
@@ -149,7 +149,7 @@ describe('superagent-oauth2-client', () => {
                 res.setHeader('Content-Type', 'application/json');
                 res.end(JSON.stringify(resp));
             } else {
-                let returnError = req.headers.authorization === 'Token access_token';
+                let returnError = req.headers.authorization === 'Bearer access_token';
                 res.statusCode = returnError ? 401 : 200;
                 let errorResp = {
                     error: 'invalid'

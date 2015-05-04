@@ -36,7 +36,7 @@ export default function(superagent) {
     }
 
     function useAccessToken(provider) {
-        this.set('Authorization', `Token ${provider.getAccessToken()}`);
+        this.set('Authorization', `Bearer ${provider.getAccessToken()}`);
         return end.call(this);
     }
 

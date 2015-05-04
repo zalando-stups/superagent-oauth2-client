@@ -103,6 +103,7 @@ describe('superagent-oauth2-client', () => {
                     .oauth(provider, DEFAULT_REQUEST);
 
         req.exec().catch(auth => {
+            expect(auth.response_type).to.equal('token');
             expect(auth.client_id).to.equal('client_id');
             expect(auth.redirect_uri).to.equal('localhost');
             expect(auth.state).to.be.ok;

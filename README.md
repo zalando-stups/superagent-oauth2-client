@@ -33,7 +33,7 @@ A superagent plugin for stressless OAuth2 token management using [oauth2-client]
 
 `then` will only be called when the original request was successful, no matter if the first or the second time.
 
-`catch` may be called for varying reasons. We may have used a valid token, but the server responded with an error. Or we requested a new access token with our refresh token, but the authorization endpoint responded with an error. Or we might just be about to redirect the user to said endpoint.
+`catch` may be called for varying reasons. We may have used a valid token, but the server responded with an error. Or we might just be about to redirect the user to the auth endpoint.
 
 ## How does it work
 
@@ -47,9 +47,7 @@ In the happy case the user logged in, gave its consent and will be redirected to
 
 It it doesn’t throw an error, everything’s good now.
 
-If there was an access token, but it’s considered invalid (=> server returns `401` status), `.oauth` will look for a refresh token in the provider. If it’s there, it uses it to get a new access token (without redirect) and issues the original request again. If this fails, the promise is rejected.
-
-If there is no refresh token, it will again redirect the user away from you.
+If there was an access token, but it’s considered invalid (=> server returns `401` status), `.oauth` will redirect the user to the auth endpoint again.
 
 ## How to save application state
 

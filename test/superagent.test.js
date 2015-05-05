@@ -129,48 +129,4 @@ describe('superagent-oauth2-client', () => {
             done();
         });
     });
-
-    it('#exec() should request a new access token with an available refresh token', done => {
-        var req = request
-                    .get(TESTLOCATION)
-                    .oauth(provider, DEFAULT_REQUEST);
-        provider.setAccessToken('access_token');
-        provider.setRefreshToken('refresh_token');
-
-        mitm.on('request', function(req, res) {
-            if (req.url.startsWith('/auth')) {
-                res.statusCode = 200;
-                let state = querystring.parse(req.url.substring('/auth?'.length)).state;
-                let resp = {
-                    state: state,
-                    token_type: 'access',
-                    access_token: 'new_access',
-                    refresh_token: 'new_refresh'
-                };
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify(resp));
-            } else {
-                let returnError = req.headers.authorization === 'Bearer access_token';
-                res.statusCode = returnError ? 401 : 200;
-                let errorResp = {
-                    error: 'invalid'
-                };
-                let resp = {
-                    data: 123
-                };
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify(returnError ? errorResp : resp));
-            }
-        });
-
-        req
-        .exec()
-        .then(resp => {
-            expect(resp.body.data).to.equal(123);
-            done();
-        })
-        .catch(e => {
-            console.log(e.stack);
-        });
-    });
 });

@@ -1,4 +1,4 @@
-import {Request, Response} from 'oauth2-client-js';
+import {Request} from 'oauth2-client-js';
 
 export default function(superagent) {
     /**
@@ -40,12 +40,6 @@ export default function(superagent) {
         return end.call(this);
     }
 
-    function refreshAccessToken(provider) {
-        return superagent
-                .get(provider.refreshToken())
-                .exec();
-    }
-
     superagent.Request.prototype.exec = function(applyMetadataFn) {
         // if this request doesn't have oauth enabled,
         // just execute it
@@ -63,28 +57,13 @@ export default function(superagent) {
                     .then(resp => {
                         // token was apparently ok
                         resolve(resp);
-                    })  
+                    })
                     .catch(accessError => {
                         if (accessError.status === 401 ) {
                             // Unauthorized
-                            if (provider.hasRefreshToken()) {
-                                refreshAccessToken(provider)
-                                    .then(resp => {
-                                        provider.handleRefresh(resp.body);
-                                        useAccessToken.call(this.clone(), provider)
-                                            .then(resolve)
-                                            .catch(reject);
-                                    })
-                                    .catch(refreshError => {
-                                        // Dunno what to do when the refresh request fails,
-                                        // so we just reject and pass the error
-                                        reject(refreshError);
-                                    });
-                            } else {
-                                // No refresh token, we need to request a new access token
-                                reject(request);
-                                return requestAccessToken(provider, request);
-                            }
+                            // No refresh token, we need to request a new access token
+                            reject(request);
+                            return requestAccessToken(provider, request);
                         } else {
                             // We got an error, but the token appears to be valid
                             // reject and pass the error
@@ -113,4 +92,4 @@ export default function(superagent) {
     };
 
     return superagent;
-};
+}

@@ -1,6 +1,6 @@
 {
   "name": "superagent-oauth2-client",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "A superagent plugin for oauth2-client",
   "keywords": [
     "oauth2",
@@ -22,8 +22,8 @@
   },
   "homepage": "https://github.com/zalando/superagent-oauth2-client",
   "peerDependencies": {
-    "oauth2-client-js": "^0.0.10",
-    "superagent": "1.2.0"
+    "oauth2-client-js": ">=0.0.10",
+    "superagent": "^1.2.0"
   },
   "devDependencies": {
     "babel": "5.1.8",

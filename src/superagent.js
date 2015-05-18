@@ -38,14 +38,14 @@ export default function(superagent) {
         return end.call(this);
     }
 
-    superagent.Request.prototype.requestAccessToken = function() {
+    superagent.Request.prototype.requestAccessToken = function(applyMetadataFn) {
         // do nothing if there is no oauth enabled
         if (!this._oauthEnabled) {
             return this;
         }
         let provider = this._oauthProvider,
             requestConfig = this._oauthRequestConfig,
-            request = buildRequest(requestConfig);
+            request = buildRequest(requestConfig, applyMetadataFn);
         return requestAccessToken(provider, request);
     };
 

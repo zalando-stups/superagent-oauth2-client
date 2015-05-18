@@ -1,6 +1,6 @@
 {
   "name": "superagent-oauth2-client",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "A superagent plugin for oauth2-client",
   "keywords": [
     "oauth2",

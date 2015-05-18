@@ -30,15 +30,24 @@ export default function(superagent) {
         // remember this request for later when we get a response
         provider.remember(request);
         // request is done via redirect to auth provider
-        if (ENV_PRODUCTION) {
-            window.location.href = redirectionUri;
-        }
+        window.location.href = redirectionUri;
     }
 
     function useAccessToken(provider) {
         this.set('Authorization', `Bearer ${provider.getAccessToken()}`);
         return end.call(this);
     }
+
+    superagent.Request.prototype.requestAccessToken = function() {
+        // do nothing if there is no oauth enabled
+        if (!this._oauthEnabled) {
+            return this;
+        }
+        let provider = this._oauthProvider,
+            requestConfig = this._oauthRequestConfig,
+            request = buildRequest(requestConfig);
+        return requestAccessToken(provider, request);
+    };
 
     superagent.Request.prototype.exec = function(applyMetadataFn) {
         // if this request doesn't have oauth enabled,

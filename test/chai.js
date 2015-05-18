@@ -8,4 +8,8 @@ global.expect = chai.expect;
 global.AssertionError = chai.AssertionError;
 global.Assertion = chai.Assertion;
 global.assert = chai.assert;
-global.ENV_PRODUCTION = false;
+global.window = {
+    location: {
+        href: ''
+    }
+};

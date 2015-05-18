@@ -12,10 +12,7 @@ module.exports = {
         libraryTarget: 'umd'
     },
     plugins: [
-        new webpack.BannerPlugin(require('./banner')),
-        new webpack.DefinePlugin({
-            ENV_PRODUCTION: true
-        })
+        new webpack.BannerPlugin(require('./banner'))
     ],
     resolve: {
         extensions: ['', '.js']

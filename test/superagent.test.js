@@ -3,9 +3,9 @@ import patchSuperagent from '../src/superagent';
 import {Provider, MemoryStorage} from 'oauth2-client-js';
 import querystring from 'querystring';
 
-// process.on('uncaughtException', function(err) {
-//     console.log('Caught exception: ' + err.stack);
-// });
+process.on('uncaughtException', function(err) {
+    console.log('Caught exception: ' + err.stack);
+});
 
 var request = patchSuperagent(superagent);
 const TESTLOCATION = 'http://localhost';
@@ -37,6 +37,16 @@ describe('superagent-oauth2-client', () => {
 
         expect(req._oauthProvider).to.equal(provider);
         expect(req._oauthEnabled).to.be.true;
+    });
+
+    it('#requestAccessToken should do a redirect', () => {
+        let req = request
+                    .get(TESTLOCATION)
+                    .oauth(provider, DEFAULT_REQUEST)
+                    .requestAccessToken();
+
+
+        expect(window.location.href.startsWith(provider.authorization_url)).to.be.true;
     });
 
     it('#exec() should return a promise', () => {

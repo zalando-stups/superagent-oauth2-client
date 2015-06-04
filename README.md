@@ -1,8 +1,8 @@
 # superagent-oauth2-client
 
-[![Join the chat at https://gitter.im/zalando/superagent-oauth2-client](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/zalando/superagent-oauth2-client?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 [![Build Status](http://img.shields.io/travis/zalando/superagent-oauth2-client.svg)](https://travis-ci.org/zalando/superagent-oauth2-client) [![Coverage Status](https://coveralls.io/repos/zalando/superagent-oauth2-client/badge.svg)](https://coveralls.io/r/zalando/superagent-oauth2-client)
+
+[![Join the chat at https://gitter.im/zalando/superagent-oauth2-client](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/zalando/superagent-oauth2-client?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A superagent plugin for stressless OAuth2 token management using [oauth2-client](https://github.com/zalando/oauth2-client).
 

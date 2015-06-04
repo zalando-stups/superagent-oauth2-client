@@ -36,6 +36,8 @@
     "istanbul": "0.3.13",
     "mitm": "1.0.3",
     "mocha": "2.2.4",
+    "oauth2-client-js": "0.0.15",
+    "superagent": "1.2.0",
     "webpack": "1.8.4"
   }
 }

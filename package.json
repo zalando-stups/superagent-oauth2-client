@@ -14,7 +14,7 @@
     "test-coverage": "babel-node ./node_modules/.bin/babel-istanbul cover _mocha -- -r test/chai.js --compilers js:babel-register test/*.test.js && cat ./coverage/lcov.info | coveralls"
   },
   "author": "Nikolaus Piccolotto <nikolaus.piccolotto@zalando.de>",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/zalando/superagent-oauth2-client.git"

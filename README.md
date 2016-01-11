@@ -8,13 +8,13 @@ A superagent plugin for stressless OAuth2 token management using [oauth2-client]
 
 ## Installation
 
-    npm i --save superagent-oauth2-client
+    npm i --save @zalando/superagent-oauth2-client
 
 ## Usage
 
     var superagent = require('superagent'),
-        request = require('superagent-oauth2-client')(superagent),
-        OAuth = require('oauth2-client-js');
+        request = require('@zalando/superagent-oauth2-client')(superagent),
+        OAuth = require('@zalando/oauth2-client-js');
 
     // define a single oauth provider
     // will use localstorage to save tokens

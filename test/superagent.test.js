@@ -1,6 +1,6 @@
 import superagent from 'superagent';
 import patchSuperagent from '../src/superagent';
-import {Provider, MemoryStorage} from 'oauth2-client-js';
+import {Provider, MemoryStorage} from '@zalando/oauth2-client-js';
 import querystring from 'querystring';
 
 process.on('uncaughtException', function(err) {
@@ -16,7 +16,7 @@ const DEFAULT_REQUEST = {
 
 describe('superagent-oauth2-client', () => {
     var provider, mitm;
-    
+
     beforeEach(() => {
         provider = new Provider({
             id: 'test',
@@ -61,7 +61,7 @@ describe('superagent-oauth2-client', () => {
                     .get(TESTLOCATION)
                     .oauth(provider, DEFAULT_REQUEST)
                     .exec(req => req.metadata.timestamp = 123);
-        
+
         expect(req instanceof Promise).to.be.true;
         req.catch(auth => {
             let saved = provider.storage.get(auth.state);
@@ -74,7 +74,7 @@ describe('superagent-oauth2-client', () => {
     });
 
 
-    it('#exec() should use an available access token', done => {        
+    it('#exec() should use an available access token', done => {
         provider.setAccessToken('token');
 
         let req = request

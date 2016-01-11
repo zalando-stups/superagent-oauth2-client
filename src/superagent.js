@@ -1,4 +1,4 @@
-import {Request} from 'oauth2-client-js';
+import {Request} from '@zalando/oauth2-client-js';
 
 export default function(superagent) {
     /**
